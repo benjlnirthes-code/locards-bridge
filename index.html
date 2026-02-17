@@ -7,58 +7,74 @@
     <script>
         const tg = window.Telegram.WebApp;
         
-        function handleRedirect() {
+        function init() {
             tg.ready();
             tg.expand();
+            tg.headerColor = '#0f0f0f';
+        }
 
+        function doRedirect() {
             const params = new URLSearchParams(window.location.search);
             const target = params.get('url');
 
             if (target) {
-                const open = () => {
+                // Имитация "проверки" перед переходом
+                document.getElementById('status').innerText = 'Личность подтверждена...';
+                document.getElementById('checkbox').innerHTML = '✅';
+                
+                setTimeout(() => {
                     if (target.includes('t.me')) {
                         tg.openTelegramLink(target);
                     } else {
                         tg.openLink(target);
                     }
-                };
-
-                // 1. Пытаемся открыться автоматически через 300мс
-                setTimeout(open, 300);
-
-                // 2. Если ТГ заблокировал авто-открытие, любой тап по экрану сработает как кнопка
-                document.body.onclick = open;
-
-                // Закрываем шторку через 8 секунд
-                setTimeout(() => { tg.close(); }, 8000);
+                    setTimeout(() => { tg.close(); }, 2000);
+                }, 800:);
             }
         }
-        window.onload = handleRedirect;
+        window.onload = init;
     </script>
     <style>
         body { 
-            background: #0f0f0f; color: white; font-family: 'Segoe UI', sans-serif; 
-            display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; height: 100vh; margin: 0; cursor: pointer;
-            user-select: none; -webkit-tap-highlight-color: transparent;
+            background: #0f0f0f; color: white; font-family: 'Segoe UI', sans-serif;
+            margin: 0; display: flex; align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
         }
-        .card-loader {
-            width: 80px; height: 110px; border: 3px solid #f82d00; border-radius: 10px;
-            position: relative; animation: flip 1.5s infinite linear;
-            background: linear-gradient(45deg, #1a1a1a, #333);
+        .captcha-container {
+            background: #1a1a1a; border: 1px solid #333;
+            border-radius: 8px; padding: 20px; width: 280px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;
         }
-        @keyframes flip {
-            0% { transform: rotateY(0deg); }
-            50% { transform: rotateY(180deg); border-color: #ff5733; }
-            100% { transform: rotateY(360deg); }
+        .raya-img {
+            width: 120px; height: 120px; margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px #00f2ff);
         }
-        .status { margin-top: 30px; font-size: 18px; font-weight: 500; letter-spacing: 0.5px; }
-        .hint { margin-top: 10px; font-size: 13px; color: #666; }
+        .captcha-box {
+            background: #252525; border: 1px solid #444;
+            display: flex; align-items: center; padding: 10px;
+            border-radius: 4px; cursor: pointer; transition: 0.2s;
+        }
+        .captcha-box:active { background: #333; }
+        .checkbox {
+            width: 24px; height: 24px; border: 2px solid #555;
+            border-radius: 3px; margin-right: 15px; background: white;
+            display: flex; align-items: center; justify-content: center;
+            color: #00b341; font-weight: bold; font-size: 18px;
+        }
+        .captcha-text { font-size: 14px; font-weight: 500; color: #ccc; }
+        .status-text { margin-top: 15px; font-size: 12px; color: #666; }
     </style>
 </head>
 <body>
-    <div class="card-loader"></div>
-    <div class="status">Загрузка задания...</div>
-    <div class="hint">Нажмите в любое место, если переход не начался</div>
+    <div class="captcha-container">
+        <img src="https://i.ibb.co/LkhK1p0/raya-placeholder.png" class="raya-img" alt="Райя">
+        
+        <div class="captcha-box" onclick="doRedirect()">
+            <div class="checkbox" id="checkbox"></div>
+            <div class="captcha-text">Я не робот</div>
+        </div>
+        
+        <div class="status-text" id="status">Требуется подтверждение личности</div>
+    </div>
 </body>
 </html>
