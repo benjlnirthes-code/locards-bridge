@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        window.onload = function() {
+            const tg = window.Telegram.WebApp;
+            tg.expand();
+            const params = new URLSearchParams(window.location.search);
+            const target = params.get('url');
+            if (target) {
+                if (target.includes('t.me')) { tg.openTelegramLink(target); } 
+                else { tg.openLink(target); }
+                setTimeout(() => { tg.close(); }, 2500);
+            }
+        };
+    </script>
+    <style>
+        body { background: #1c1c1c; color: white; font-family: sans-serif; text-align: center; padding-top: 45%; }
+    </style>
+</head>
+<body><p>Загрузка задания ЛоCards...</p></body>
+</html>
