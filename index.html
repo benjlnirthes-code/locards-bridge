@@ -5,54 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ЛоCards Sync</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-        const tg = window.Telegram.WebApp;
-        function init() {
-            tg.ready();
-            tg.expand();
-        }
-
-        function doRedirect() {
-            const params = new URLSearchParams(window.location.search);
-            const target = params.get('url');
-            if (target) {
-                const container = document.getElementById('captcha-btn');
-                const status = document.getElementById('status');
-                
-                container.classList.add('loading');
-                status.innerText = 'ПРОВЕРКА...';
-
-                setTimeout(() => {
-                    container.classList.remove('loading');
-                    container.classList.add('success');
-                    status.innerText = 'СИНХРОНИЗАЦИЯ...';
-                    status.style.color = '#34c759'; 
-                    
-                    setTimeout(() => {
-                        if (target.includes('t.me')) { 
-                            tg.openTelegramLink(target); 
-                        } else { 
-                            tg.openLink(target); 
-                        }
-                        setTimeout(() => { tg.close(); }, 2000);
-                    }, 800);
-                }, 1200); 
-            }
-        }
-        window.onload = init;
-    </script>
     <style>
+        :root {
+            --primary-color: #34c759;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
         body { 
             margin: 0; padding: 0; height: 100vh;
             background-color: #000;
+            /* Фоновое изображение всей страницы */
             background-image: url('banner.jpg');
             background-repeat: no-repeat;
             background-position: center top; 
             background-size: cover;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
         }
 
+        /* Адаптация под разные экраны */
         @media (min-aspect-ratio: 1/1) {
             body { background-size: contain; background-position: center center; }
         }
@@ -60,16 +34,14 @@
         .glass-card {
             position: fixed; 
             bottom: 50px; 
-            left: 50%; 
-            transform: translateX(-50%);
-            width: 270px;
-            height: 460px; /* Немного увеличили высоту для нового заголовка */
+            width: 280px;
+            height: 480px;
             padding: 35px 15px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--glass-border);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
@@ -78,15 +50,16 @@
             color: white;
             text-align: center;
             box-sizing: border-box;
+            transition: transform 0.3s ease;
         }
 
-        /* --- НОВЫЙ КРАСИВЫЙ ЗАГОЛОВОК --- */
+        /* Заголовок */
         .brand-container {
             margin-bottom: 5px;
         }
 
         .game-name {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 900;
             letter-spacing: 3px;
             text-transform: uppercase;
@@ -109,43 +82,50 @@
         .status {
             font-size: 11px;
             opacity: 0.7;
-            margin-top: 10px;
+            margin-top: 12px;
             font-weight: 400;
-            transition: color 0.3s ease;
+            min-height: 1.2em;
+            transition: all 0.3s ease;
         }
 
+        /* Изображение Райи */
         .raya-image-container {
             flex-grow: 1;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
             width: 100%;
         }
 
         .raya-image {
-            max-width: 95%;
-            max-height: 200px; 
-            filter: drop-shadow(0 0 15px rgba(28, 42, 77, 0.5));
+            max-width: 90%;
+            max-height: 220px; 
+            filter: drop-shadow(0 0 20px rgba(28, 42, 77, 0.6));
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
+        /* Контейнер Капчи */
         .captcha-container {
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 22px;
             padding: 12px 18px;
-            display: flex; align-items: center;
+            display: flex; 
+            align-items: center;
             cursor: pointer; 
             width: 85%;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
-            box-shadow: 
-                0 4px 15px rgba(0,0,0,0.4),
-                inset 0 1px 1px rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
         }
 
         .captcha-container:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
             background: rgba(0, 0, 0, 0.5);
         }
 
+        /* Чекбокс */
         .checkbox {
             width: 28px; height: 28px;
             border-radius: 50%;
@@ -154,8 +134,10 @@
             display: flex; align-items: center; justify-content: center;
             position: relative;
             transition: all 0.4s ease;
+            flex-shrink: 0;
         }
 
+        /* Анимация загрузки */
         .checkbox::after {
             content: "";
             position: absolute;
@@ -164,7 +146,6 @@
             border: 2px solid transparent;
             border-top-color: #fff;
             opacity: 0;
-            transition: opacity 0.2s;
         }
 
         .loading .checkbox::after {
@@ -174,11 +155,11 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Состояние успеха */
         .success .checkbox {
             background: linear-gradient(135deg, rgba(52, 199, 89, 0.9), rgba(46, 204, 113, 0.6));
             border-color: rgba(255, 255, 255, 0.4);
             box-shadow: 0 0 15px rgba(52, 199, 89, 0.5);
-            backdrop-filter: blur(4px);
         }
 
         .checkmark-svg {
@@ -198,6 +179,11 @@
         .captcha-text {
             font-size: 14px; font-weight: 600; opacity: 0.9;
         }
+
+        /* Отключение кликов после нажатия */
+        .disabled {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -206,14 +192,14 @@
         <div class="brand-container">
             <div class="game-name">ЛоCards</div>
             <div class="title">Sync Module</div>
-            <div id="status" class="status">Райя-Прайм: ожидание синхронизации...</div>
+            <div id="status" class="status">Райя-Прайм: ожидает...</div>
         </div>
 
         <div class="raya-image-container">
             <img src="raya.png" class="raya-image" alt="Raya Prime">
         </div>
 
-        <div class="captcha-container" id="captcha-btn" onclick="doRedirect()">
+        <div class="captcha-container" id="captcha-btn" onclick="startProcess()">
             <div class="checkbox" id="check">
                 <svg class="checkmark-svg" viewBox="0 0 52 52">
                     <path d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
@@ -223,5 +209,63 @@
         </div>
     </div>
 
+    <script>
+        const tg = window.Telegram.WebApp;
+
+        // Инициализация WebApp
+        function init() {
+            tg.ready();
+            tg.expand(); // Развернуть на всё окно
+            
+            // Настройка цвета статус-бара (если поддерживается)
+            if (tg.setHeaderColor) tg.setHeaderColor('#000000');
+        }
+
+        let isProcessing = false;
+
+        function startProcess() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const params = new URLSearchParams(window.location.search);
+            const target = params.get('url'); // Получаем URL из параметров ?url=...
+            
+            const container = document.getElementById('captcha-btn');
+            const status = document.getElementById('status');
+            
+            // Шаг 1: Загрузка (имитация проверки)
+            container.classList.add('loading');
+            container.classList.add('disabled');
+            status.innerText = 'ПРОВЕРКА...';
+
+            setTimeout(() => {
+                // Шаг 2: Успех
+                container.classList.remove('loading');
+                container.classList.add('success');
+                status.innerText = 'СИНХРОНИЗАЦИЯ...';
+                status.style.color = '#34c759'; 
+                
+                // Шаг 3: Редирект
+                setTimeout(() => {
+                    if (target) {
+                        if (target.includes('t.me')) { 
+                            tg.openTelegramLink(target); 
+                        } else { 
+                            tg.openLink(target); 
+                        }
+                    } else {
+                        status.innerText = 'ОШИБКА: URL НЕ НАЙДЕН';
+                        status.style.color = '#ff3b30';
+                        return;
+                    }
+                    
+                    // Закрываем мини-апп через небольшую паузу
+                    setTimeout(() => { tg.close(); }, 1500);
+                }, 1000);
+            }, 1500); 
+        }
+
+        window.onload = init;
+    </script>
 </body>
 </html>
