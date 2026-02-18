@@ -3,78 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ЛоCards Sync</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         const tg = window.Telegram.WebApp;
-        
         function init() {
             tg.ready();
             tg.expand();
-            tg.headerColor = '#0f0f0f';
         }
 
         function doRedirect() {
             const params = new URLSearchParams(window.location.search);
             const target = params.get('url');
-
             if (target) {
-                // Имитация "проверки" перед переходом
-                document.getElementById('status').innerText = 'Личность подтверждена...';
-                document.getElementById('checkbox').innerHTML = '✅';
+                // Визуальное подтверждение
+                document.getElementById('status').innerText = 'СИНХРОНИЗАЦИЯ...';
+                document.getElementById('check').innerHTML = '✔';
+                document.getElementById('card').style.borderColor = 'rgba(255, 255, 255, 0.8)';
                 
                 setTimeout(() => {
-                    if (target.includes('t.me')) {
-                        tg.openTelegramLink(target);
-                    } else {
-                        tg.openLink(target);
-                    }
+                    if (target.includes('t.me')) { tg.openTelegramLink(target); } 
+                    else { tg.openLink(target); }
                     setTimeout(() => { tg.close(); }, 2000);
-                }, 800:);
+                }, 800);
             }
         }
         window.onload = init;
     </script>
     <style>
         body { 
-            background: #0f0f0f; color: white; font-family: 'Segoe UI', sans-serif;
-            margin: 0; display: flex; align-items: center; justify-content: center;
-            height: 100vh; overflow: hidden;
-        }
-        .captcha-container {
-            background: #1a1a1a; border: 1px solid #333;
-            border-radius: 8px; padding: 20px; width: 280px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;
-        }
-        .raya-img {
-            width: 120px; height: 120px; margin-bottom: 15px;
-            filter: drop-shadow(0 0 10px #00f2ff);
-        }
-        .captcha-box {
-            background: #252525; border: 1px solid #444;
-            display: flex; align-items: center; padding: 10px;
-            border-radius: 4px; cursor: pointer; transition: 0.2s;
-        }
-        .captcha-box:active { background: #333; }
-        .checkbox {
-            width: 24px; height: 24px; border: 2px solid #555;
-            border-radius: 3px; margin-right: 15px; background: white;
+            margin: 0; padding: 0; height: 100vh;
+            /* Используем твою картинку как фон */
+            background: url('e951fa82b316912eaedf4a3f71f2a3b8.jpg') no-repeat center center;
+            background-size: cover;
             display: flex; align-items: center; justify-content: center;
-            color: #00b341; font-weight: bold; font-size: 18px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
         }
-        .captcha-text { font-size: 14px; font-weight: 500; color: #ccc; }
-        .status-text { margin-top: 15px; font-size: 12px; color: #666; }
+
+        /* Твой CSS из генератора Glassmorphism */
+        .glass-card {
+            width: 280px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(17px);
+            -webkit-backdrop-filter: blur(17px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        /* Эффект блика сверху */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        }
+
+        .title {
+            font-size: 22px; font-weight: 800; letter-spacing: 2px;
+            margin: 0 0 10px 0; text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .status {
+            font-size: 13px; opacity: 0.9; margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .captcha-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .captcha-container:active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .checkbox {
+            width: 28px; height: 28px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            margin-right: 15px;
+            display: flex; align-items: center; justify-content: center;
+            color: #00b341; font-size: 20px; font-weight: bold;
+        }
+
+        .captcha-text {
+            font-size: 16px; font-weight: 600;
+        }
     </style>
 </head>
 <body>
-    <div class="captcha-container">
-        <img src="https://i.ibb.co/LkhK1p0/raya-placeholder.png" class="raya-img" alt="Райя">
-        
-        <div class="captcha-box" onclick="doRedirect()">
-            <div class="checkbox" id="checkbox"></div>
+
+    <div class="glass-card" id="card">
+        <div class="title">Sync Module</div>
+        <div class="status" id="status">Райя-Прайм ожидает подтверждения личности...</div>
+
+        <div class="captcha-container" onclick="doRedirect()">
+            <div class="checkbox" id="check"></div>
             <div class="captcha-text">Я не робот</div>
         </div>
-        
-        <div class="status-text" id="status">Требуется подтверждение личности</div>
     </div>
+
 </body>
 </html>
