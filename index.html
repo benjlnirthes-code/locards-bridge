@@ -7,13 +7,12 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         const tg = window.Telegram.WebApp;
-        
-        // Звук успеха (короткий системный сигнал)
-        const successSound = new Audio('data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYAAAB/f39/f38=');
-
         function init() {
             tg.ready();
             tg.expand();
+            // Настройка цветов темы Telegram
+            tg.setHeaderColor('#000000');
+            tg.setBackgroundColor('#000000');
         }
 
         function doRedirect() {
@@ -24,22 +23,20 @@
                 const status = document.getElementById('status');
                 const card = document.getElementById('card');
                 
-                // Старт загрузки
                 container.classList.add('loading');
-                status.innerText = 'АНАЛИЗ БИОМЕТРИИ...';
+                status.innerText = 'ПРОВЕРКА МОДУЛЯ...';
+                status.style.opacity = "0.7";
 
                 setTimeout(() => {
-                    // Успех
                     container.classList.remove('loading');
                     container.classList.add('success');
                     card.classList.add('is-success'); 
                     
-                    status.innerText = 'ДОСТУП РАЗРЕШЕН';
+                    status.innerText = 'СИНХРОНИЗАЦИЯ УСПЕШНА';
                     status.style.color = '#34c759'; 
+                    status.style.opacity = "1";
                     
-                    // Эффекты iOS
                     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                    try { successSound.play(); } catch(e) {}
 
                     setTimeout(() => {
                         if (target.includes('t.me')) { 
@@ -49,7 +46,7 @@
                         }
                         setTimeout(() => { tg.close(); }, 2000);
                     }, 1200);
-                }, 1800); // Чуть дольше для эффекта сканирования
+                }, 1800); 
             }
         }
         window.onload = init;
@@ -57,142 +54,177 @@
     <style>
         :root {
             --ios-green: #34c759;
-            --ios-blue: #007aff;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --accent-blue: #007aff;
         }
 
         body { 
             margin: 0; padding: 0; height: 100vh;
-            background: #000 url('banner.jpg') no-repeat center top;
+            background-color: #000;
+            /* Важно: фоновое изображение должно быть контрастным для эффекта стекла */
+            background-image: radial-gradient(circle at top right, rgba(0, 122, 255, 0.15), transparent),
+                              url('banner.jpg');
+            background-repeat: no-repeat;
+            background-position: center; 
             background-size: cover;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
         .glass-card {
-            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
-            width: 275px; height: 470px; padding: 35px 15px;
+            position: relative;
+            width: 300px;
+            height: 500px; 
+            padding: 40px 20px;
             background: var(--glass-bg);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 45px;
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 50px;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            /* Тень с небольшим внутренним свечением */
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
             box-sizing: border-box;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Пульсация рамки при успехе */
+        /* Эффект успешного свечения всей карты */
         .glass-card.is-success {
-            border-color: var(--ios-green);
-            box-shadow: 0 0 30px rgba(52, 199, 89, 0.3), 0 25px 50px rgba(0, 0, 0, 0.7);
+            border-color: rgba(52, 199, 89, 0.3);
+            box-shadow: 0 25px 80px rgba(52, 199, 89, 0.15), 
+                        inset 0 0 0 1px rgba(52, 199, 89, 0.1);
         }
 
-        /* Логотип */
+        /* --- ЗАГОЛОВОК --- */
+        .brand-section { text-align: center; }
+
         .game-logo {
-            font-size: 32px; font-weight: 900; letter-spacing: -1px;
-            background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.5) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
-            animation: shimmer 3s infinite ease-in-out;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(0.98); }
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
         }
 
         .module-tag {
-            font-size: 10px; font-weight: 600; letter-spacing: 5px;
-            text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: -5px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #8e8e93, #fff, #8e8e93);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.6;
         }
 
-        /* Виджет Райи */
+        .status-msg {
+            font-size: 12px; 
+            color: #fff;
+            margin-top: 15px; 
+            font-weight: 400;
+            opacity: 0.5;
+            transition: all 0.4s ease;
+        }
+
+        /* --- ПЕРСОНАЖ --- */
         .raya-viewport {
-            position: relative; width: 100%; height: 220px;
+            position: relative;
+            width: 100%;
+            height: 240px;
             display: flex; align-items: center; justify-content: center;
-            overflow: hidden; /* Чтобы линия сканера не вылетала */
-        }
-
-        /* Линия сканирования */
-        .raya-viewport::after {
-            content: ""; position: absolute; top: -10%; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--ios-blue), transparent);
-            box-shadow: 0 0 15px var(--ios-blue);
-            opacity: 0; z-index: 10;
-        }
-
-        .loading .raya-viewport::after {
-            opacity: 1;
-            animation: scan 1.5s infinite ease-in-out;
-        }
-
-        @keyframes scan {
-            0% { top: 0%; }
-            50% { top: 100%; }
-            100% { top: 0%; }
         }
 
         .raya-img {
-            position: absolute; max-width: 90%; max-height: 200px;
-            object-fit: contain; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: absolute;
+            max-width: 100%;
+            max-height: 220px;
+            object-fit: contain;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .raya-blue { opacity: 1; filter: drop-shadow(0 0 15px rgba(0, 122, 255, 0.4)); }
-        .raya-green { opacity: 0; transform: scale(0.5); filter: brightness(1.5); }
+        .raya-blue {
+            opacity: 1;
+            filter: drop-shadow(0 10px 20px rgba(0, 122, 255, 0.3));
+            transform: translateY(0) scale(1);
+        }
 
-        .is-success .raya-blue { opacity: 0; transform: scale(1.2) rotate(-10deg); }
+        .raya-green {
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+        }
+
+        .is-success .raya-blue { 
+            opacity: 0; 
+            transform: translateY(-20px) scale(0.9); 
+        }
         .is-success .raya-green { 
-            opacity: 1; transform: scale(1.1); 
-            filter: drop-shadow(0 0 25px rgba(52, 199, 89, 0.6));
+            opacity: 1; 
+            transform: translateY(0) scale(1.05);
+            filter: drop-shadow(0 15px 30px rgba(52, 199, 89, 0.5));
         }
 
-        /* Кнопка */
+        /* --- КНОПКА КУПЮРЫ --- */
         .captcha-btn {
-            background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px; padding: 14px 20px; display: flex; align-items: center;
-            cursor: pointer; width: 88%; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 16px 24px;
+            display: flex; align-items: center;
+            cursor: pointer; width: 95%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .captcha-btn:active { transform: scale(0.96); }
+        .captcha-btn:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.1); }
 
         .check-circle {
-            width: 30px; height: 30px; border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.3); margin-right: 15px;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-right: 15px;
             display: flex; align-items: center; justify-content: center;
-            position: relative; transition: all 0.4s ease;
-        }
-
-        /* Анимация спиннера во время загрузки */
-        .loading .check-circle {
-            border-color: var(--ios-blue);
-            animation: pulse-blue 1s infinite;
-        }
-
-        @keyframes pulse-blue {
-            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
-            100% { box-shadow: 0 0 0 10px rgba(0, 122, 255, 0); }
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .checkmark {
-            width: 18px; height: 18px; stroke: #fff; stroke-width: 5; fill: none;
+            width: 16px; height: 16px;
+            stroke: #fff; stroke-width: 6; fill: none;
             stroke-dasharray: 50; stroke-dashoffset: 50;
-            transition: stroke-dashoffset 0.5s ease 0.2s;
+            transition: stroke-dashoffset 0.5s ease 0.3s;
         }
 
         .success .check-circle {
-            background: var(--ios-green); border-color: transparent;
-            box-shadow: 0 0 20px rgba(52, 199, 89, 0.4);
+            background: var(--ios-green);
+            border-color: var(--ios-green);
+            box-shadow: 0 0 15px rgba(52, 199, 89, 0.5);
         }
 
         .success .checkmark { stroke-dashoffset: 0; }
 
-        .status-msg {
-            font-size: 11px; color: rgba(255,255,255,0.6);
-            margin-top: 10px; font-weight: 600; letter-spacing: 0.5px;
+        .btn-text {
+            font-size: 16px; 
+            font-weight: 600; 
+            color: #fff;
+            letter-spacing: -0.2px;
+        }
+
+        /* Эффект загрузки */
+        .loading .check-circle {
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -202,12 +234,12 @@
         <div class="brand-section">
             <div class="game-logo">ЛоCards</div>
             <div class="module-tag">Sync Module</div>
-            <div id="status" class="status-msg">ОЖИДАНИЕ СИНХРОНИЗАЦИИ...</div>
+            <div id="status" class="status-msg">Инициализация Райя-Прайм...</div>
         </div>
 
-        <div class="raya-viewport" id="viewport">
+        <div class="raya-viewport">
             <img src="raya.png" class="raya-img raya-blue" alt="Raya Blue">
-            <img src="raya_green.png" class="raya-img raya-green" alt="Raya Success">
+            <img src="ChatGPT Image 18 февр. 2026 г., 03_26_09.jpg" class="raya-img raya-green" alt="Raya Success">
         </div>
 
         <div class="captcha-btn" id="captcha-btn" onclick="doRedirect()">
@@ -216,7 +248,7 @@
                     <path d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                 </svg>
             </div>
-            <div style="font-size: 15px; font-weight: 700; letter-spacing: -0.2px;">Я не робот</div>
+            <div class="btn-text">Я не робот</div>
         </div>
     </div>
 
