@@ -16,19 +16,30 @@
             const params = new URLSearchParams(window.location.search);
             const target = params.get('url');
             if (target) {
-                document.getElementById('status').innerText = 'СИНХРОНИЗАЦИЯ...';
-                document.getElementById('status').style.color = '#00ff88';
-                document.getElementById('check').innerHTML = '✔';
-                document.getElementById('card').style.borderColor = 'rgba(255, 255, 255, 0.8)';
+                const container = document.getElementById('captcha-btn');
+                const check = document.getElementById('check');
+                const status = document.getElementById('status');
                 
+                // 1. Состояние загрузки
+                container.classList.add('loading');
+                status.innerText = 'ПРОВЕРКА...';
+
                 setTimeout(() => {
-                    if (target.includes('t.me')) { 
-                        tg.openTelegramLink(target); 
-                    } else { 
-                        tg.openLink(target); 
-                    }
-                    setTimeout(() => { tg.close(); }, 2000);
-                }, 800);
+                    // 2. Состояние успеха
+                    container.classList.remove('loading');
+                    container.classList.add('success');
+                    status.innerText = 'СИНХРОНИЗАЦИЯ...';
+                    status.style.color = '#34c759'; // iOS Green
+                    
+                    setTimeout(() => {
+                        if (target.includes('t.me')) { 
+                            tg.openTelegramLink(target); 
+                        } else { 
+                            tg.openLink(target); 
+                        }
+                        setTimeout(() => { tg.close(); }, 2000);
+                    }, 800);
+                }, 1200); // Время вращения спиннера
             }
         }
         window.onload = init;
@@ -41,7 +52,7 @@
             background-repeat: no-repeat;
             background-position: center top; 
             background-size: cover;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
 
@@ -50,92 +61,123 @@
         }
 
         .glass-card {
-            /* --- НАСТРОЙКИ ПОЗИЦИИ ПО ПИКСЕЛЯМ --- */
             position: fixed; 
-            bottom: 50px; /* 👈 Двигай ВВЕРХ/ВНИЗ (расстояние от нижнего края) */
-            left: 50%;    /* 👈 Центровка по горизонтали */
-            transform: translateX(-50%); /* 👈 Оставь это, чтобы карточка была ровно по центру */
-            
-            /* Если захочешь сдвинуть ВБОК по пикселям, убери transform и напиши:
-               left: 50px; (расстояние от левого края) */
-
+            bottom: 50px; 
+            left: 50%; 
+            transform: translateX(-50%);
             width: 270px;
             height: 430px; 
             padding: 40px 20px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: 35px;
+            border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 
-                0 15px 35px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-            
-            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             color: white;
             text-align: center;
-            transition: all 0.3s ease;
-            box-sizing: border-box; /* Чтобы паддинги не увеличивали размер */
-        }
-
-        .glass-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .title {
-            font-size: 19px; font-weight: 800; letter-spacing: 2px;
-            margin: 0 0 5px 0; text-transform: uppercase;
+            font-size: 20px; font-weight: 700; letter-spacing: 1px;
+            margin: 0; text-transform: uppercase;
         }
 
         .status {
-            font-size: 11px; opacity: 0.8; line-height: 1.3; transition: color 0.3s;
+            font-size: 11px; opacity: 0.6; margin-top: 8px;
+            transition: color 0.3s ease;
         }
 
         .raya-image-container {
             flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .raya-image {
-            max-width: 85%;
-            max-height: 160px; 
-            object-fit: contain;
-            filter: drop-shadow(0 0 12px rgba(28, 42, 77, 0.6)) 
-                    drop-shadow(0 0 4px rgba(61, 44, 34, 0.4));
+            max-width: 85%; max-height: 180px; 
+            filter: drop-shadow(0 0 15px rgba(28, 42, 77, 0.4));
         }
 
+        /* --- КРАСИВАЯ КНОПКА IOS STYLE --- */
         .captcha-container {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            width: 90%;
-            box-sizing: border-box;
+            border-radius: 20px;
+            padding: 14px 20px;
+            display: flex; align-items: center;
+            cursor: pointer; width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .captcha-container:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .checkbox {
-            width: 24px; height: 24px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 6px;
-            margin-right: 12px;
+            width: 28px; height: 28px;
+            border-radius: 50%; /* Круглый стиль iOS */
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            margin-right: 15px;
             display: flex; align-items: center; justify-content: center;
-            color: #00b341; font-size: 18px; font-weight: bold;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Спиннер (загрузка) */
+        .checkbox::after {
+            content: "";
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #fff;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .loading .checkbox {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading .checkbox::after {
+            opacity: 1;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Галочка (успех) */
+        .checkmark-svg {
+            width: 18px; height: 18px;
+            stroke: #fff;
+            stroke-width: 4;
+            fill: none;
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+            transition: stroke-dashoffset 0.4s ease 0.1s;
+        }
+
+        .success .checkbox {
+            background: #34c759; /* iOS Green */
+            border-color: #34c759;
+        }
+
+        .success .checkmark-svg {
+            stroke-dashoffset: 0;
         }
 
         .captcha-text {
-            font-size: 14px; font-weight: 600;
+            font-size: 15px; font-weight: 500; letter-spacing: -0.3px;
         }
     </style>
 </head>
@@ -144,15 +186,19 @@
     <div class="glass-card" id="card">
         <div>
             <div class="title">Sync Module</div>
-            <div class="status" id="status">Райя-Прайм: ожидание подтверждения для синхронизации карт...</div>
+            <div id="status" class="status">Райя-Прайм ожидает синхронизации...</div>
         </div>
 
         <div class="raya-image-container">
             <img src="raya.png" class="raya-image" alt="Raya Prime">
         </div>
 
-        <div class="captcha-container" onclick="doRedirect()">
-            <div class="checkbox" id="check"></div>
+        <div class="captcha-container" id="captcha-btn" onclick="doRedirect()">
+            <div class="checkbox" id="check">
+                <svg class="checkmark-svg" viewBox="0 0 52 52">
+                    <path d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
             <div class="captcha-text">Я не робот</div>
         </div>
     </div>
