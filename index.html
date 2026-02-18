@@ -63,8 +63,8 @@
             left: 50%; 
             transform: translateX(-50%);
             width: 270px;
-            height: 440px; 
-            padding: 40px 15px;
+            height: 460px; /* Немного увеличили высоту для нового заголовка */
+            padding: 35px 15px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -80,13 +80,37 @@
             box-sizing: border-box;
         }
 
+        /* --- НОВЫЙ КРАСИВЫЙ ЗАГОЛОВОК --- */
+        .brand-container {
+            margin-bottom: 5px;
+        }
+
+        .game-name {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+            margin-bottom: 2px;
+        }
+
         .title {
-            font-size: 20px; font-weight: 700; letter-spacing: 1px;
-            margin: 0; text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin: 0;
         }
 
         .status {
-            font-size: 11px; opacity: 0.7; margin-top: 8px;
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 10px;
+            font-weight: 400;
             transition: color 0.3s ease;
         }
 
@@ -97,25 +121,24 @@
         }
 
         .raya-image {
-            max-width: 95%; /* Чуть шире кнопки для контраста */
-            max-height: 190px; 
+            max-width: 95%;
+            max-height: 200px; 
             filter: drop-shadow(0 0 15px rgba(28, 42, 77, 0.5));
         }
 
-        /* --- ОБЪЕМНАЯ ТЕМНАЯ КНОПКА --- */
         .captcha-container {
-            background: rgba(0, 0, 0, 0.4); /* Темнее, чтобы не сливалась */
+            background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 22px;
             padding: 12px 18px;
             display: flex; align-items: center;
             cursor: pointer; 
-            width: 85%; /* Уже картинки */
+            width: 85%;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
             box-shadow: 
                 0 4px 15px rgba(0,0,0,0.4),
-                inset 0 1px 1px rgba(255,255,255,0.1); /* Эффект объема */
+                inset 0 1px 1px rgba(255,255,255,0.1);
         }
 
         .captcha-container:active {
@@ -133,7 +156,6 @@
             transition: all 0.4s ease;
         }
 
-        /* Спиннер */
         .checkbox::after {
             content: "";
             position: absolute;
@@ -152,7 +174,6 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- СТЕКЛЯННАЯ ЗЕЛЕНАЯ ГАЛОЧКА --- */
         .success .checkbox {
             background: linear-gradient(135deg, rgba(52, 199, 89, 0.9), rgba(46, 204, 113, 0.6));
             border-color: rgba(255, 255, 255, 0.4);
@@ -182,7 +203,8 @@
 <body>
 
     <div class="glass-card" id="card">
-        <div>
+        <div class="brand-container">
+            <div class="game-name">ЛоCards</div>
             <div class="title">Sync Module</div>
             <div id="status" class="status">Райя-Прайм: ожидание синхронизации...</div>
         </div>
