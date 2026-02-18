@@ -18,16 +18,24 @@
             if (target) {
                 const container = document.getElementById('captcha-btn');
                 const status = document.getElementById('status');
+                const card = document.getElementById('card');
                 
+                // Переход в режим загрузки
                 container.classList.add('loading');
-                status.innerText = 'ПРОВЕРКА...';
+                status.innerText = 'ПРОВЕРКА МОДУЛЯ...';
 
                 setTimeout(() => {
+                    // Успешная активация
                     container.classList.remove('loading');
                     container.classList.add('success');
-                    status.innerText = 'СИНХРОНИЗАЦИЯ...';
+                    card.classList.add('is-success'); // Активируем зеленую Райю
+                    
+                    status.innerText = 'СИНХРОНИЗАЦИЯ УСПЕШНА';
                     status.style.color = '#34c759'; 
                     
+                    // Легкая вибрация телефона (если поддерживается)
+                    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
                     setTimeout(() => {
                         if (target.includes('t.me')) { 
                             tg.openTelegramLink(target); 
@@ -35,13 +43,19 @@
                             tg.openLink(target); 
                         }
                         setTimeout(() => { tg.close(); }, 2000);
-                    }, 800);
-                }, 1200); 
+                    }, 1000);
+                }, 1500); 
             }
         }
         window.onload = init;
     </script>
     <style>
+        :root {
+            --ios-green: #34c759;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
         body { 
             margin: 0; padding: 0; height: 100vh;
             background-color: #000;
@@ -51,10 +65,7 @@
             background-size: cover;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
-        }
-
-        @media (min-aspect-ratio: 1/1) {
-            body { background-size: contain; background-position: center center; }
+            display: flex; align-items: center; justify-content: center;
         }
 
         .glass-card {
@@ -62,164 +73,156 @@
             bottom: 50px; 
             left: 50%; 
             transform: translateX(-50%);
-            width: 270px;
-            height: 460px; /* Немного увеличили высоту для нового заголовка */
+            width: 275px;
+            height: 470px; 
             padding: 35px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 45px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            color: white;
-            text-align: center;
             box-sizing: border-box;
+            transition: border-color 0.5s ease;
         }
 
-        /* --- НОВЫЙ КРАСИВЫЙ ЗАГОЛОВОК --- */
-        .brand-container {
-            margin-bottom: 5px;
-        }
+        /* --- СТИЛЬНЫЙ ЗАГОЛОВОК --- */
+        .brand-section { margin-bottom: 5px; }
 
-        .game-name {
-            font-size: 26px;
+        .game-logo {
+            font-size: 32px;
             font-weight: 900;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+            letter-spacing: -1px;
+            background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.5) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
-            margin-bottom: 2px;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+            animation: shimmer 3s infinite ease-in-out;
         }
 
-        .title {
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(0.98); }
+        }
+
+        .module-tag {
             font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 4px;
+            font-weight: 600;
+            letter-spacing: 5px;
             text-transform: uppercase;
-            opacity: 0.5;
-            margin: 0;
+            color: rgba(255,255,255,0.4);
+            margin-top: -5px;
         }
 
-        .status {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-top: 10px;
-            font-weight: 400;
-            transition: color 0.3s ease;
-        }
-
-        .raya-image-container {
-            flex-grow: 1;
-            display: flex; align-items: center; justify-content: center;
+        /* --- КОНТЕЙНЕР ДЛЯ СМЕНЫ КАРТИНОК --- */
+        .raya-viewport {
+            position: relative;
             width: 100%;
+            height: 220px;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .raya-image {
-            max-width: 95%;
-            max-height: 200px; 
-            filter: drop-shadow(0 0 15px rgba(28, 42, 77, 0.5));
+        .raya-img {
+            position: absolute;
+            max-width: 90%;
+            max-height: 200px;
+            object-fit: contain;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .captcha-container {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 22px;
-            padding: 12px 18px;
-            display: flex; align-items: center;
-            cursor: pointer; 
-            width: 85%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none;
-            box-shadow: 
-                0 4px 15px rgba(0,0,0,0.4),
-                inset 0 1px 1px rgba(255,255,255,0.1);
+        /* Синяя Райя (по умолчанию) */
+        .raya-blue {
+            opacity: 1;
+            filter: drop-shadow(0 0 15px rgba(0, 80, 255, 0.4));
+            transform: scale(1);
         }
 
-        .captcha-container:active {
-            transform: scale(0.95);
+        /* Зеленая Райя (скрыта) */
+        .raya-green {
+            opacity: 0;
+            transform: scale(0.8);
+            filter: drop-shadow(0 0 20px rgba(52, 199, 89, 0));
+        }
+
+        /* Состояние успеха */
+        .is-success .raya-blue { opacity: 0; transform: scale(1.1) rotate(5deg); }
+        .is-success .raya-green { 
+            opacity: 1; 
+            transform: scale(1); 
+            filter: drop-shadow(0 0 25px rgba(52, 199, 89, 0.6));
+        }
+
+        /* --- КНОПКА --- */
+        .captcha-btn {
             background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 14px 20px;
+            display: flex; align-items: center;
+            cursor: pointer; width: 88%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05);
         }
 
-        .checkbox {
-            width: 28px; height: 28px;
+        .captcha-btn:active { transform: scale(0.96); }
+
+        .check-circle {
+            width: 30px; height: 30px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            margin-right: 12px;
+            margin-right: 15px;
             display: flex; align-items: center; justify-content: center;
             position: relative;
             transition: all 0.4s ease;
         }
 
-        .checkbox::after {
-            content: "";
-            position: absolute;
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-top-color: #fff;
-            opacity: 0;
-            transition: opacity 0.2s;
+        /* Анимация галочки */
+        .checkmark {
+            width: 18px; height: 18px;
+            stroke: #fff; stroke-width: 5; fill: none;
+            stroke-dasharray: 50; stroke-dashoffset: 50;
+            transition: stroke-dashoffset 0.5s ease 0.2s;
         }
 
-        .loading .checkbox::after {
-            opacity: 1;
-            animation: spin 0.8s linear infinite;
+        .success .check-circle {
+            background: linear-gradient(135deg, #34c759, #2ecc71);
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(52, 199, 89, 0.4);
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .success .checkmark { stroke-dashoffset: 0; }
 
-        .success .checkbox {
-            background: linear-gradient(135deg, rgba(52, 199, 89, 0.9), rgba(46, 204, 113, 0.6));
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 15px rgba(52, 199, 89, 0.5);
-            backdrop-filter: blur(4px);
-        }
-
-        .checkmark-svg {
-            width: 16px; height: 16px;
-            stroke: #fff;
-            stroke-width: 5;
-            fill: none;
-            stroke-dasharray: 50;
-            stroke-dashoffset: 50;
-            transition: stroke-dashoffset 0.5s ease 0.1s;
-        }
-
-        .success .checkmark-svg {
-            stroke-dashoffset: 0;
-        }
-
-        .captcha-text {
-            font-size: 14px; font-weight: 600; opacity: 0.9;
+        .status-msg {
+            font-size: 11px; color: rgba(255,255,255,0.6);
+            margin-top: 10px; font-weight: 500;
         }
     </style>
 </head>
 <body>
 
     <div class="glass-card" id="card">
-        <div class="brand-container">
-            <div class="game-name">ЛоCards</div>
-            <div class="title">Sync Module</div>
-            <div id="status" class="status">Райя-Прайм: ожидание синхронизации...</div>
+        <div class="brand-section">
+            <div class="game-logo">ЛоCards</div>
+            <div class="module-tag">Sync Module</div>
+            <div id="status" class="status-msg">Инициализация модуля Райя-Прайм...</div>
         </div>
 
-        <div class="raya-image-container">
-            <img src="raya.png" class="raya-image" alt="Raya Prime">
+        <div class="raya-viewport">
+            <img src="raya.png" class="raya-img raya-blue" alt="Raya Blue">
+            <img src="ChatGPT Image 18 февр. 2026 г., 03_26_09.jpg" class="raya-img raya-green" alt="Raya Success">
         </div>
 
-        <div class="captcha-container" id="captcha-btn" onclick="doRedirect()">
-            <div class="checkbox" id="check">
-                <svg class="checkmark-svg" viewBox="0 0 52 52">
+        <div class="captcha-btn" id="captcha-btn" onclick="doRedirect()">
+            <div class="check-circle" id="check">
+                <svg class="checkmark" viewBox="0 0 52 52">
                     <path d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                 </svg>
             </div>
-            <div class="captcha-text">Я не робот</div>
+            <div style="font-size: 15px; font-weight: 600;">Я не робот</div>
         </div>
     </div>
 
